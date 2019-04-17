@@ -84,7 +84,7 @@ def deepdream(net, base_img, iter_n=10, octave_n=4, step_size=1.5, octave_scale=
             vis = deprocess(net, src.data[0])
             if not clip:  # adjust image contrast if clipping is disabled
                 vis = vis * (255.0 / np.percentile(vis, 99.98))
-            print(octave, i, end, vis.shape)
+            #print(octave, i, end, vis.shape)
 
         # extract details produced on the current octave
         detail = src.data[0] - octave_base
@@ -335,16 +335,17 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
                 
 
     def getStats(saveframe, var_counter, vids, difference):
+        if var_counter % 100 == 0:
         # Stats
-        print('***************************************')
-        print('Saving Image As: ' + saveframe)
-        print('Frame ' + str(var_counter) + ' of ' + str(len(vids)))
-        print('Frame Time: ' + str(difference) + 's')
-        timeleft = difference * (len(vids) - var_counter)
-        m, s = divmod(timeleft, 60)
-        h, m = divmod(m, 60)
-        print('Estimated Total Time Remaining: ' + str(timeleft) + 's (' + "%d:%02d:%02d" % (h, m, s) + ')')
-        print('***************************************')
+            print('***************************************')
+            print('Saving Image As: ' + saveframe)
+            print('Frame ' + str(var_counter) + ' of ' + str(len(vids)))
+            print('Frame Time: ' + str(difference) + 's')
+            timeleft = difference * (len(vids) - var_counter)
+            m, s = divmod(timeleft, 60)
+            h, m = divmod(m, 60)
+            print('Estimated Total Time Remaining: ' + str(timeleft) + 's (' + "%d:%02d:%02d" % (h, m, s) + ')')
+            print('***************************************')
 
     if flow is 1:
         import cv2
@@ -367,7 +368,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
                 previousGrayImg = grayImg
 
                 newframe = inputdir + '/' + vids[v + 1]
-                print('Processing: ' + newframe)
+                #print('Processing: ' + newframe)
                 endparam = layers[var_counter % len(layers)]
 
                 ## calclurating optical flows
@@ -435,7 +436,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
                 h, w = frame.shape[:2]
                 s = 0.05  # scale coefficient  
 
-                print('Processing: ' + inputdir + '/' + vid)
+                #print('Processing: ' + inputdir + '/' + vid)
 
                 # setup
                 now = time.time()
