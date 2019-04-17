@@ -244,7 +244,7 @@ def saveImage(outputdir, image, filename, index):
     save_filename = outputdir + '/' + filename + '_%06d.png' % index
     PIL.Image.fromarray(np.uint8(image)).save(save_filename)
 
-def main(inputdir, outputdir, preview, octaves, octave_scale, iterations, jitter, zoom, stepsize, blendflow, blendstatic, layers, guide, gpu, flow, flowthresh, divide, maxWidth, maxHeight):
+def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_scale, iterations, jitter, zoom, stepsize, blendflow, blendstatic, layers, guide, gpu, flow, flowthresh, divide, maxWidth, maxHeight):
     # input var setup
     make_sure_path_exists(inputdir)
     make_sure_path_exists(outputdir)
@@ -266,10 +266,9 @@ def main(inputdir, outputdir, preview, octaves, octave_scale, iterations, jitter
 
 
     # Loading DNN model
-    model_name = 'bvlc_googlenet'
-    model_path = '../caffe/models/' + model_name + '/'
-    net_fn = model_path + 'deploy.prototxt'
-    param_fn = model_path + 'bvlc_googlenet.caffemodel'
+    model_path = os.path.join(models_path, model_name)
+    net_fn = os.path.join(model_path, 'deploy.prototxt')
+    param_fn = os.path.join(model_path, model_name + '.caffemodel')
 
     # Patching model to be able to compute gradients.
     # Note that you can also manually add "force_backward: true" line to "deploy.prototxt".
@@ -489,6 +488,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='DeepDreamAnim')
     parser.add_argument('-i', '--input', help='Input directory', required=True)
     parser.add_argument('-o', '--output', help='Output directory', required=True)
+    
+    parser.add_argument('-t', '--modelspath', help='Path to the directory containing the caffe models.', type=str, required=False, default="../caffe/models")
+    parser.add_argument('-m', '--modelname', help='Name of the caffe model to use.', type=str, required=False, default="bvlc_googlenet")
+    
     parser.add_argument('-p', '--preview', help='Preview image width. Default: 0', type=int, required=False)
     parser.add_argument('-oct', '--octaves', help='Octaves. Default: 4', type=int, required=False)
     parser.add_argument('-octs', '--octavescale', help='Octave Scale. Default: 1.4', type=float, required=False)
@@ -521,5 +524,5 @@ if __name__ == "__main__":
         if args.framerate is not None: framerate = args.framerate
         createVideo(args.input, args.output, framerate)
     else:   
-        main(args.input, args.output, args.preview, args.octaves, args.octavescale, args.iterations, args.jitter,
+        main(args.input, args.output, args.modelspath, args.modelname, args.preview, args.octaves, args.octavescale, args.iterations, args.jitter,
              args.zoom, args.stepsize, args.blendflow, args.blendstatic, args.layers, args.guide, args.gpu, args.flow, args.flowthresh, args.divide, args.maxWidth, args.maxHeight)

@@ -36,6 +36,21 @@ In that case, the image division will not be applied to the earlier stage of the
 
 # Usage
 
+## Dependencies for a Debian system with Python 3
+
+```bash
+# Caffe
+sudo apt install caffe-cuda
+# Caffe models
+git clone https://github.com/BVLC/caffe
+# Example for using the Inception model -> Download weights
+./scripts/download_model_binary.py caffe/models/bvlc_googlenet
+# OpenCV
+pip install opencv-python-headless
+# Numpy
+pip install numpy==1.15
+```
+
 <pre>usage: dreamer.py [-h] -i INPUT -o OUTPUT -it IMAGE_TYPE [--gpu GPU]
                        [-t MODEL_PATH] [-m MODEL_NAME] [-p PREVIEW]
                        [-oct OCTAVES] [-octs OCTAVESCALE] [-itr ITERATIONS]
