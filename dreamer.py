@@ -374,7 +374,7 @@ def main(inputdir, outputdir, preview, octaves, octave_scale, iterations, jitter
                 ## calclurating optical flows
                 img = np.float32(PIL.Image.open(newframe))
                 grayImg = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-                flow = cv2.calcOpticalFlowFarneback(previousGrayImg, grayImg, pyr_scale=0.5, levels=3, winsize=15,
+                flow = cv2.calcOpticalFlowFarneback(previousGrayImg, grayImg, None, pyr_scale=0.5, levels=3, winsize=15,
                                                     iterations=3, poly_n=5, poly_sigma=1.2, flags=0)
                 
                 inv_flow = flow;
