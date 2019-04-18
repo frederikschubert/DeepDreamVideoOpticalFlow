@@ -687,6 +687,7 @@ def createVideo(inputdir, outputdir, framerate):
         + '/*.png" -c:v libx264 -crf 20 -pix_fmt yuv420p -tune fastdecode -tune zerolatency -profile:v baseline '
         + outputdir
     )
+    print(command_str)
     print(
         subprocess.Popen(command_str, shell=True, stdout=subprocess.PIPE).stdout.read()
     )
