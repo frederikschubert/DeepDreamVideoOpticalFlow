@@ -291,7 +291,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
     for frame in vidinput:
         # if not ".png" in frame: continue
         vids.append(frame)
-	img_path = os.path.join(inputdir, vids[0])
+        img_path = os.path.join(inputdir, vids[0])
     img = PIL.Image.open(img_path)
     if preview is not 0:
         img = resizePicture(img_path, preview)
