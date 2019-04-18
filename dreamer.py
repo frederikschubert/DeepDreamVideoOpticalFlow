@@ -355,7 +355,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
             hallu = getFrame(net, img, iterations, layers[0], objective_guide)
                 
         np.clip(hallu, 0, 255, out=hallu)
-        saveframe = os.path.join(outputdir, 'frame_000000.png')
+        saveframe = os.path.join(outputdir, vids[0])
         PIL.Image.fromarray(np.uint8(hallu)).save(saveframe)
         grayImg = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         for v in range(len(vids)):
