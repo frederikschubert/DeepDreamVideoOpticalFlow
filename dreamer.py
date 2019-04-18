@@ -240,10 +240,6 @@ def make_sure_path_exists(path):
         if exception.errno != errno.EEXIST:
             raise
 
-def saveImage(outputdir, image, filename, index):
-    save_filename = outputdir + '/' + filename + '_%06d.png' % index
-    PIL.Image.fromarray(np.uint8(image)).save(save_filename)
-
 def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_scale, iterations, jitter, zoom, stepsize, blendflow, blendstatic, layers, guide, gpu, flow, flowthresh, divide, maxWidth, maxHeight):
     # input var setup
     make_sure_path_exists(inputdir)
@@ -295,15 +291,15 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
     for frame in vidinput:
         # if not ".png" in frame: continue
         vids.append(frame)
-	
-    img = PIL.Image.open(inputdir + '/' + vids[0])
+	img_path = os.path.join(inputdir, vids[0])
+    img = PIL.Image.open(img_path)
     if preview is not 0:
-        img = resizePicture(inputdir + '/' + vids[0], preview)
+        img = resizePicture(img_path, preview)
     frame = np.float32(img)
 
     # guide
     if guide is not None:
-        guideimg = PIL.Image.open(inputdir + '/' + guide)
+        guideimg = PIL.Image.open(os.path.join(inputdir, guide))
         guideimgresized = guideimg.resize((224, 224), PIL.Image.ANTIALIAS)
         guide = np.float32(guideimgresized)
         end = layers[0]  # 'inception_3b/output'
@@ -351,7 +347,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
         import cv2
 
         # optical flow
-        img = np.float32(PIL.Image.open(inputdir + '/' + vids[0]))
+        img = np.float32(PIL.Image.open(os.path.join(inputdir, vids[0])))
         h, w, c = img.shape
         if guide is None:
             hallu = getFrame(net, img, iterations, layers[0])
@@ -359,7 +355,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
             hallu = getFrame(net, img, iterations, layers[0], objective_guide)
                 
         np.clip(hallu, 0, 255, out=hallu)
-        saveframe = outputdir + '/' + 'frame_000000.png'
+        saveframe = os.path.join(outputdir, 'frame_000000.png')
         PIL.Image.fromarray(np.uint8(hallu)).save(saveframe)
         grayImg = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         for v in range(len(vids)):
@@ -367,7 +363,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
                 previousImg = img
                 previousGrayImg = grayImg
 
-                newframe = inputdir + '/' + vids[v + 1]
+                newframe = os.path.join(inputdir, vids[v + 1])
                 #print('Processing: ' + newframe)
                 endparam = layers[var_counter % len(layers)]
 
@@ -387,7 +383,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
                 if blendflow == 0:
                     halludiff = previousImg - previousImg
                 else:
-                    preframe = inputdir + '/' + vids[v]
+                    preframe = os.path.join(inputdir, vids[v])
                     halludiff = morphPicture(preframe, saveframe, blendflow, preview) - previousImg
 
                 halludiff = cv2.remap(halludiff, flow, None, cv2.INTER_LINEAR)
@@ -420,7 +416,7 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
                 later = time.time()
                 difference = int(later - now)
 
-                saveframe = outputdir + '/' + 'frame_%06d.png' % (var_counter)
+                saveframe = os.path.join(outputdir, vids[v + 1])
                 getStats(saveframe, var_counter, vids, difference)
 
                 np.clip(hallu, 0, 255, out=hallu)
@@ -436,8 +432,6 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
                 h, w = frame.shape[:2]
                 s = 0.05  # scale coefficient  
 
-                #print('Processing: ' + inputdir + '/' + vid)
-
                 # setup
                 now = time.time()
                 endparam = layers[var_counter % len(layers)]
@@ -449,14 +443,14 @@ def main(inputdir, outputdir, models_path, model_name, preview, octaves, octave_
 
                 later = time.time()
                 difference = int(later - now)
-                saveframe = outputdir + '/' + 'frame_%06d.png' % (var_counter)
+                saveframe = os.path.join(outputdir, vids[v + 1])
                 getStats(saveframe, var_counter, vids, difference)
 
                 # save image
                 PIL.Image.fromarray(np.uint8(frame)).save(saveframe)
 
                 # setup next image
-                newframe = inputdir + '/' + vids[v + 1]
+                newframe = os.path.join(inputdir, vids[v + 1])
 
                 # blend
                 if blendstatic == 0:
@@ -481,7 +475,7 @@ def extractVideo(inputdir, outputdir):
 
 def createVideo(inputdir, outputdir, framerate):
     print(subprocess.Popen('ffmpeg -r ' + str(
-        framerate) + ' -f image2 -i "' + inputdir + '/frame_%6d.png" -c:v libx264 -crf 20 -pix_fmt yuv420p -tune fastdecode -tune zerolatency -profile:v baseline ' + outputdir,
+        framerate) + ' -f image2 -i "' + inputdir + '/*.png" -c:v libx264 -crf 20 -pix_fmt yuv420p -tune fastdecode -tune zerolatency -profile:v baseline ' + outputdir,
                            shell=True, stdout=subprocess.PIPE).stdout.read())
 
 
