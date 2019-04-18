@@ -682,7 +682,7 @@ def createVideo(inputdir, outputdir, framerate):
     command_str = (
         "ffmpeg -r "
         + str(framerate)
-        + '-pattern_type glob -f image2 -i "'
+        + ' -pattern_type glob -f image2 -i "'
         + inputdir
         + '/*.png" -c:v libx264 -crf 20 -pix_fmt yuv420p -tune fastdecode -tune zerolatency -profile:v baseline '
         + outputdir
